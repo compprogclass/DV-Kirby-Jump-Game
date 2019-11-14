@@ -1,0 +1,77 @@
+use Libraries.Game.Game
+use Libraries.Game.InputMonitor
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Skybox
+use Libraries.Game.Graphics.Camera
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.Color
+use Libraries.Game.Graphics.AmbientLight
+use Libraries.Game.Graphics.DirectionalLight
+use Libraries.Compute.Vector3
+
+class Main is Game
+InputMonitor monitor
+KeyboardEvent keys
+Skybox skybox
+Camera camera=undefined
+Model model
+Color color
+AmbientLight alight
+DirectionalLight dlight
+Vector3 vector
+Vector3 axis
+
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        skybox:Load("Skybox/sandcastle_rt.png","Skybox/sandcastle_lf.png","Skybox/sandcastle_up.png","Skybox/sandcastle_dn.png","Skybox/sandcastle_ft.png","Skybox/sandcastle_bk.png")
+        SetSkybox(skybox)
+
+        camera=GetCamera3D()
+        model:LoadBox(1,1,1,color:Cyan())
+
+        alight:SetColor(0.9,0.8,0.8,1)
+
+        dlight:SetColor(0.4,0.4,0.5,1)
+        dlight:SetDirection(GetCamera3D():GetDirection())
+
+        vector:Set(0,0,0)
+        axis:Set(0,1,0)
+
+        SetAmbientLight(alight)
+        Add(dlight)
+        Add(model)
+    end
+
+    action Update (number seconds)
+        if monitor:IsKeyPressed(keys:ESCAPE)
+            Exit()
+        end
+        if monitor:IsKeyPressed(keys:A)
+            camera:Move(0.1,0,0)
+        end
+        if monitor:IsKeyPressed(keys:D)
+            camera:Move(-0.1,0,0)
+        end
+        if monitor:IsKeyPressed(keys:W)
+            camera:Move(0,0,-0.1)
+        end
+        if monitor:IsKeyPressed(keys:S)
+            camera:Move(0,0,0.1)
+        end
+        if monitor:IsKeyPressed(keys:E)
+            //camera:LookAt(0,0,0)
+            camera:RotateAround(vector,axis,1)
+            model:Rotate(0,0,1,1)
+        end
+        if monitor:IsKeyPressed(keys:Q)
+            //camera:LookAt(0,0,0)
+            camera:RotateAround(vector,axis,-1)
+            model:Rotate(0,0,1,-1)
+        end
+    end
+end
