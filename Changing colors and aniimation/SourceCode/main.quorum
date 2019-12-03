@@ -11,6 +11,7 @@ use Libraries.Game.Layer2D
 use Libraries.Game.Graphics.Painter2D
 use Libraries.Game.Graphics.Gradient
 use Libraries.Game.Graphics.ImageSheet
+use Libraries.Game.Graphics.Camera
 
 
 class Main is Game, CollisionListener2D, KeyboardListener
@@ -36,6 +37,7 @@ Color Green
 CollisionEvent2D List
 Vector2 Linearvelocity
 Gradient gradient
+Camera camera=undefined
 
 integer count = 0
 number currentx = Kirby:GetGlobalX()
@@ -44,6 +46,13 @@ number currenty = Kirby:GetGlobalY()
 number speed = 1.5
 integer jumpCounter = 0
 integer jumpCounterTwo = 0
+number spinningp1x = spinningp1:GetGlobalX()
+number spinningp1y = spinningp1:GetGlobalY()
+number spinningp2x = spinningp2:GetGlobalX()
+number spinningp2y = spinningp2:GetGlobalY()
+number offset = 100
+number screenx = 685
+boolean center = false
 
     action Main
         SetScreenSize (1370,800)
@@ -51,13 +60,12 @@ integer jumpCounterTwo = 0
     end
 
     action CreateGame
-        //Layer2D Background_layer
         EnablePhysics2D(true)
         integer sizeX = 200
         integer sizeY = 20
         number accelarationx = 0
-        number accelarationy = -450
-        Vector2 gravity //= Set(direction,accelaration)
+        number accelarationy = -460
+        Vector2 gravity
         gravity:Set(accelarationx,accelarationy)
         SetGravity2D(gravity)
         Cyan=Cyan:Cyan()
@@ -69,7 +77,7 @@ integer jumpCounterTwo = 0
         Floor:SetName ("Floor")
         Floor:SetCollidable (true)
         Floor:SetPosition(0,1)
-        Floor:LoadFilledRectangle(1370,80)
+        Floor:LoadFilledRectangle(5000,80)
         Floor:EnablePhysics(true)
         Floor:SetUnmovable()
 
@@ -120,13 +128,13 @@ integer jumpCounterTwo = 0
         Background:SetName ("Background")
         //Background:SetCollidable(true)
         Background:SetPosition(0,0)
-        Background:LoadFilledRectangle(1370,800,Cyan)
+        Background:LoadFilledRectangle(5000,800,Cyan)
         //Background:EnablePhysics(true)
         
         Background2:SetName("Background2")
         Background2:SetCollidable(true)
-        Background2:SetPosition(1370,0)
-        Background2:LoadFilledRectangle(1370,800,Cyan)
+        Background2:SetPosition(5000,0)
+        Background2:LoadFilledRectangle(5000,800,Cyan)
         //Background2:EnablePhysics(true)
         
         Kirby:SetName("me")
@@ -137,8 +145,10 @@ integer jumpCounterTwo = 0
         Kirby:EnablePhysics(true)
         Kirby:SetResponsive()
 
+        camera=GetCamera2D()
+        camera:SetPosition(screenx,400,0)
+
         Add(Background)
-        //Add(Background2)
         Add(Kirby)
         Add(Floor)
         Add(PlatformRed)
@@ -155,56 +165,48 @@ integer jumpCounterTwo = 0
         Drawable itemA = cast(Drawable, event:GetItemA())
         Drawable itemB = cast(Drawable, event:GetItemB())
             if (itemA:GetName() = "me" and itemB:GetName() = "Floor")
-                Kirby:SetPosition(currentx,currenty+2)
                 Vector2 linearVelocity
                 linearVelocity:Set(0,0)
                 Kirby:SetLinearVelocity(linearVelocity)
                 jumpCounter = 0
                 jumpCounterTwo = 0
             elseif (itemA:GetName() = "me" and itemB:GetName() = "PlatformBlue")
-                Kirby:SetPosition(currentx,currenty+2)
                 Vector2 linearVelocity
                 linearVelocity:Set(0,0)
                 Kirby:SetLinearVelocity(linearVelocity)
                 jumpCounter = 0
                 jumpCounterTwo = 0
            elseif (itemA:GetName() = "me" and itemB:GetName() = "PlatformRed")
-            Kirby:SetPosition(currentx,currenty+2)
                 Vector2 linearVelocity
                 linearVelocity:Set(0,0)
                 Kirby:SetLinearVelocity(linearVelocity)
                 jumpCounter = 0
                 jumpCounterTwo = 0
            elseif (itemA:GetName() = "me" and itemB:GetName() = "PlatformGreen")
-            Kirby:SetPosition(currentx,currenty+2)
                 Vector2 linearVelocity
                 linearVelocity:Set(0,0)
                 Kirby:SetLinearVelocity(linearVelocity)
                 jumpCounter = 0
                 jumpCounterTwo = 0
            elseif (itemA:GetName() = "me" and itemB:GetName() = "spinningp1")
-               Kirby:SetPosition(currentx,currenty+2)
                Vector2 linearVelocity
                linearVelocity:Set(0,0)
                Kirby:SetLinearVelocity(linearVelocity)
                jumpCounter = 0
                jumpCounterTwo = 0
            elseif (itemA:GetName() = "me" and itemB:GetName()= "spinningp2")
-               Kirby:SetPosition(currentx,currenty+2) 
                Vector2 linearVelocity
                linearVelocity:Set(0,0)
                Kirby:SetLinearVelocity(linearVelocity)
                jumpCounter = 0
                jumpCounterTwo = 0
            elseif (itemA:GetName() = "me" and itemB:GetName()= "spinningp3")
-               Kirby:SetPosition(currentx,currenty+2) 
                Vector2 linearVelocity
                linearVelocity:Set(0,0)
                Kirby:SetLinearVelocity(linearVelocity)
                jumpCounter = 0
                jumpCounterTwo = 0
            elseif (itemA:GetName() = "me" and itemB:GetName()= "spinningp4")
-               Kirby:SetPosition(currentx,currenty+2) 
                Vector2 linearVelocity
                linearVelocity:Set(0,0)
                Kirby:SetLinearVelocity(linearVelocity)
@@ -216,14 +218,15 @@ integer jumpCounterTwo = 0
         count = count+1
         if count mod 500=166
             Red=Red:Red()
-            Background:LoadFilledRectangle(1370,800,Red)
+            Background:LoadFilledRectangle(5000,800,Red)
             PlatformBlue:SetCollidable(true)
             PlatformRed:SetCollidable(false)
             Remove(PlatformRed)
             Add(PlatformBlue)
+            //MovePlatforms(spinningp1,spinningp2)
         end
         if count mod 500=0
-            Background:LoadFilledRectangle(1370,800,Cyan)
+            Background:LoadFilledRectangle(5000,800,Cyan)
             PlatformBlue:SetCollidable(false)
             PlatformRed:SetCollidable(true)
             PlatformGreen:SetCollidable(true)
@@ -231,7 +234,7 @@ integer jumpCounterTwo = 0
             Add(PlatformGreen)
         end
         if count mod 500=333
-            Background:LoadFilledRectangle(1370,800,Green)
+            Background:LoadFilledRectangle(5000,800,Green)
             //Remove(PlatformGreen)
             PlatformBlue:SetCollidable(true)
             PlatformRed:SetCollidable(true)
@@ -272,10 +275,24 @@ integer jumpCounterTwo = 0
     end
 
     action Move(integer press)
+        if currentx >= 640
+            center = true
+        end
         if press = keys:D
             Kirby:SetPosition(currentx+speed,currenty)
+            if center = true
+            screenx=screenx+1.5
+            camera:SetPosition(screenx,400,0)
+            end
         elseif press = keys:A
             Kirby:SetPosition(currentx-speed,currenty)
+        if center = true
+            screenx=screenx-1.5
+            camera:SetPosition(screenx,400,0)
+        end
+        if currentx<685
+            center = false
+        end
         elseif press = keys:SPACE and jumpCounter<2
                 Kirby:SetPosition(currentx,currenty+speed)
         end
@@ -284,13 +301,13 @@ integer jumpCounterTwo = 0
     action MoveTwo(integer pressOne, integer pressTwo)
         if pressOne = keys:SPACE and pressTwo = keys:D and jumpCounter<2 and jumpCounterTwo<100
             Vector2 linearVelocity
-            linearVelocity:Set(250,0)
+            linearVelocity:Set(100,0)
             Kirby:SetLinearVelocity(linearVelocity)
             jumpCounterTwo = jumpCounterTwo+1
         end
         if pressOne = keys:SPACE and pressTwo = keys:A and jumpCounter<2 and jumpCounterTwo<100
             Vector2 linearVelocity
-            linearVelocity:Set(-250,0)
+            linearVelocity:Set(-100,0)
             Kirby:SetLinearVelocity(linearVelocity)
             jumpCounterTwo = jumpCounterTwo+1
         end
